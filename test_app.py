@@ -31,7 +31,7 @@ def test_whatsapp_webhook_with_200():
         "MediaUrl0": "https://example.com/audio.mp3",
         "MediaContentType0": "audio/mp3",
     }
-    with patch("openai.OpenAI") as mock_openai:
+    with patch("openai.OpenAI"):
         # Send a POST request to the /whatsapp endpoint
         response = client.post("/whatsapp", data=form_data)
 
