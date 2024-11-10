@@ -28,8 +28,9 @@ async def get_request_body(request: Request, Body: str = Form(...)):
 
 
 def get_twilio_response(media_url: str):
-    audio_response = requests.get(media_url, auth=HTTPBasicAuth(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
-    print(audio_response.headers)
+    audio_response = requests.get(
+        media_url, auth=HTTPBasicAuth(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    )
     return audio_response.content
 
 
@@ -42,7 +43,9 @@ def write_adio_content_to_file(audio_content: bytes) -> str:
 
 def get_transcription(path_to_file: str) -> str:
     audio_file = open(path_to_file, "rb")
-    transcript = openai_client.audio.transcriptions.create(model="whisper-1", file=audio_file)
+    transcript = openai_client.audio.transcriptions.create(
+        model="whisper-1", file=audio_file
+    )
     transcription = transcript.text
     if len(transcription.split(" ")) > 40:
         transcription = transcription.strip()
@@ -68,7 +71,9 @@ async def index(request: Request):
 
 
 @app.post("/whatsapp")
-async def whatsapp_webhook(request: Request, Body: str = Form(...), NumMedia: str = Form(default="0")):
+async def whatsapp_webhook(
+    request: Request, Body: str = Form(...), NumMedia: str = Form(default="0")
+):
     (form, resp, _, msg) = await get_request_body(request, Body)
 
     if int(NumMedia) > 0:
