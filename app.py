@@ -48,7 +48,7 @@ def get_transcription(path_to_file: str) -> str:
         transcription = transcription.strip()
 
         # Process transcription with GPT-3.5
-        prompt = f"Summarize the following text in less of 40 words:\n\n{transcription}"
+        prompt = f"Summarize the following text in less of 40 words, and maintain the same language as the original text:\n\n{transcription}"
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
