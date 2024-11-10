@@ -31,17 +31,17 @@ def test_whatsapp_webhook_with_200():
         "MediaUrl0": "https://example.com/audio.mp3",
         "MediaContentType0": "audio/mp3",
     }
+    with patch("openai.OpenAI") as mock_openai:
+        # Send a POST request to the /whatsapp endpoint
+        response = client.post("/whatsapp", data=form_data)
 
-    # Send a POST request to the /whatsapp endpoint
-    response = client.post("/whatsapp", data=form_data)
-
-    # Assert the response status code and content
-    assert response.status_code == 200
-    result = xmltodict.parse(response.text)
-    expeted_result = """
-    Error processing audio: Error code: 400 - {'error': {'message': "Invalid file format. Supported formats: ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']", 'type': 'invalid_request_error', 'param': None, 'code': None}}
-    """.strip()
-    assert result["Response"]["Message"]["Body"] == expeted_result
+        # Assert the response status code and content
+        assert response.status_code == 200
+        result = xmltodict.parse(response.text)
+        expeted_result = """
+        Error processing audio: Error code: 400 - {'error': {'message': "Invalid file format. Supported formats: ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']", 'type': 'invalid_request_error', 'param': None, 'code': None}}
+        """.strip()
+        assert result["Response"]["Message"]["Body"] == expeted_result
 
 
 def test_whatsapp_webhook_with_422():
