@@ -6,7 +6,13 @@ from twilio.twiml.messaging_response import MessagingResponse, Message
 import xmltodict
 
 load_dotenv()
-from .app import app, get_request_body, get_transcription, get_twilio_response, write_adio_content_to_file
+from .app import (
+    app,
+    get_request_body,
+    get_transcription,
+    get_twilio_response,
+    write_adio_content_to_file,
+)
 
 client = TestClient(app)
 
@@ -42,7 +48,13 @@ def test_whatsapp_webhook_with_422():
     response = client.post("/whatsapp", json={"Body": "Hello, world!"})
     assert response.status_code == 422
     assert response.json() == {
-        "detail": [{"loc": ["body", "Body"], "msg": "field required", "type": "value_error.missing"}]
+        "detail": [
+            {
+                "loc": ["body", "Body"],
+                "msg": "field required",
+                "type": "value_error.missing",
+            }
+        ]
     }
 
 
@@ -51,7 +63,9 @@ async def test_get_request_body():
     response_mock = AsyncMock()
     body_mock = "Hello from WhatsApp!"
     expected_msg = "hello from whatsapp!"
-    form, resp, incoming_msg, msg = await get_request_body(response_mock, Body=body_mock)
+    form, resp, incoming_msg, msg = await get_request_body(
+        response_mock, Body=body_mock
+    )
     assert form is not None
     assert isinstance(resp, MessagingResponse)
     assert incoming_msg == expected_msg
@@ -72,7 +86,9 @@ def test_get_transcription():
         patch("os.remove"),
         patch("builtins.open"),
         patch("openai.resources.audio.Audio.transcriptions"),
-        patch("openai.resources.audio.transcriptions.Transcriptions.create") as mock_transcriptions_create,
+        patch(
+            "openai.resources.audio.transcriptions.Transcriptions.create"
+        ) as mock_transcriptions_create,
     ):
         mock_transcriptions_create.return_value.text = "transcription"
         mock_openai.audio.transcriptions.create.return_value.text = "transcription"
@@ -83,7 +99,7 @@ def test_get_transcription():
 
 def test_write_adio_content_to_file():
     audio_content = "audio content"
-    expected_path_to_file = "received_audio.mp3"
+    expected_path_to_file = "/tmp/received_audio.mp3"
     with patch("builtins.open"):
         path_to_file = write_adio_content_to_file(audio_content)
         assert path_to_file == expected_path_to_file
@@ -93,8 +109,11 @@ def test_get_transcription():
     with (
         patch("openai.OpenAI") as mock_openai,
         patch("builtins.open"),
+        patch("os.remove"),
         patch("openai.resources.audio.Audio.transcriptions"),
-        patch("openai.resources.audio.transcriptions.Transcriptions.create") as mock_transcriptions_create,
+        patch(
+            "openai.resources.audio.transcriptions.Transcriptions.create"
+        ) as mock_transcriptions_create,
     ):
         mock_transcriptions_create.return_value.text = "transcription"
         mock_openai.audio.transcriptions.create.return_value.text = "transcription"
