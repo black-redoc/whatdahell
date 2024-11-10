@@ -58,7 +58,7 @@ def get_transcription(path_to_file: str) -> str:
         )
         summary = response.choices[0].message.content.strip()
         transcription = summary.split("Summary:")[-1].strip()
-        os.remove("received_audio.mp3")
+    os.remove(path_to_file)
     return transcription
 
 
