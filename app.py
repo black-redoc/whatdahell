@@ -29,11 +29,12 @@ async def get_request_body(request: Request, Body: str = Form(...)):
 
 def get_twilio_response(media_url: str):
     audio_response = requests.get(media_url, auth=HTTPBasicAuth(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
+    print(audio_response.headers)
     return audio_response.content
 
 
 def write_adio_content_to_file(audio_content: bytes) -> str:
-    path_to_file = "received_audio.mp3"
+    path_to_file = "/tmp/received_audio.mp3"
     with open(path_to_file, "wb") as f:
         f.write(audio_content)
     return path_to_file
