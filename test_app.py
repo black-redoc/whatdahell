@@ -45,17 +45,18 @@ def test_whatsapp_webhook_with_200():
 
 
 def test_whatsapp_webhook_with_422():
-    response = client.post("/whatsapp", json={"Body": "Hello, world!"})
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "loc": ["body", "Body"],
-                "msg": "field required",
-                "type": "value_error.missing",
-            }
-        ]
-    }
+    with patch("openai.OpenAI"):
+        response = client.post("/whatsapp", json={"Body": "Hello, world!"})
+        assert response.status_code == 422
+        assert response.json() == {
+            "detail": [
+                {
+                    "loc": ["body", "Body"],
+                    "msg": "field required",
+                    "type": "value_error.missing",
+                }
+            ]
+        }
 
 
 @pytest.mark.asyncio
