@@ -1,4 +1,5 @@
 import os
+from typing import Any
 import openai
 from fastapi import FastAPI, Request
 from fastapi import FastAPI, Request, Form
@@ -32,7 +33,7 @@ async def get_request_body(
     return form, resp, incoming_msg, msg
 
 
-def get_twilio_response(media_url: str) -> bytes | any:
+def get_twilio_response(media_url: str) -> bytes | Any:
     audio_response = requests.get(
         media_url, auth=HTTPBasicAuth(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
     )
