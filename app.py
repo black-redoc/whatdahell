@@ -1,10 +1,10 @@
 import os
 from typing import Any
 import openai
-from fastapi import FastAPI, Request
 from fastapi import FastAPI, Request, Form
 from starlette.requests import FormData
-from fastapi.responses import Response
+from fastapi.responses import Response, HTMLResponse
+from fastapi.templating import Jinja2Templates
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.twiml import TwiML
 import requests
@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = FastAPI()
+
+templates = Jinja2Templates(directory="templates")
 
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
@@ -80,8 +82,13 @@ def get_transcription(path_to_file: str) -> str:
 
 
 @app.get("/")
-async def index(request: Request) -> dict[str, str]:
-    return {"hello": "world"}
+async def index(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc):
+    return templates.TemplateResponse("404.html", {"request": request})
 
 
 @app.post("/whatsapp")

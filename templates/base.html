@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content="WhatdaHellBot" />
+        <meta name="keywords" content="WhatdaHellBot" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- Tailwind CSS -->
+        <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+              rel="stylesheet" />
+        <title>WhatdaHellBot</title>
+        <style>
+            body {
+                height: 100vh;
+            }
+            .main {
+                height: 100%;
+                display: grid;
+                grid-template-rows: auto 1fr auto;
+            }
+            .header {
+
+            }
+            .content {
+            }
+            .footer {
+                color:red;
+            }
+        </style>
+    </head>
+    <body class="container mx-auto p-8 bg-gray-900 text-white font-sans flex flex-col">
+        <main class="main">
+            <section class="header">
+                {% include "header.html" %}
+            </section>
+            <section class="content">
+                {% block content %}
+                {% endblock content %}
+            </section>
+            <section class="footer">
+                <!--Footer -->
+                {% include "footer.html" %}
+                <!--Fin Footer -->
+            </section>
+        </main>
+    </body>
+</html>
