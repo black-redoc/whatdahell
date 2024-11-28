@@ -2,10 +2,13 @@ import os
 import openai
 from fastapi import FastAPI, Request
 from fastapi import FastAPI, Request, Form
+from starlette.requests import FormData
 from fastapi.responses import Response
 from twilio.twiml.messaging_response import MessagingResponse
+from twilio.twiml import TwiML
 import requests
 from requests.auth import HTTPBasicAuth
+from langdetect import detect
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,7 +22,9 @@ openai_client = openai.OpenAI(
 )
 
 
-async def get_request_body(request: Request, Body: str = Form(...)):
+async def get_request_body(
+    request: Request, Body: str = Form(...)
+) -> tuple[FormData, MessagingResponse, str, TwiML | str]:
     form = await request.form()
     incoming_msg = Body.strip().lower()
     resp = MessagingResponse()
@@ -27,7 +32,7 @@ async def get_request_body(request: Request, Body: str = Form(...)):
     return form, resp, incoming_msg, msg
 
 
-def get_twilio_response(media_url: str):
+def get_twilio_response(media_url: str) -> bytes | any:
     audio_response = requests.get(
         media_url, auth=HTTPBasicAuth(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
     )
@@ -50,8 +55,16 @@ def get_transcription(path_to_file: str) -> str:
     if len(transcription.split(" ")) > 40:
         transcription = transcription.strip()
 
+        # Detect language of the transcription
+        language = detect(transcription)
         # Process transcription with GPT-3.5
-        prompt = f"Summarize the following text in less of 40 words, and maintain the same language as the original text:\n\n{transcription}"
+        prompt = f"""
+        Summarize the following text in no more than 41 words, keeping the summary in {language}:
+
+
+        Text:
+        {transcription}
+        """
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -66,14 +79,14 @@ def get_transcription(path_to_file: str) -> str:
 
 
 @app.get("/")
-async def index(request: Request):
+async def index(request: Request) -> dict[str, str]:
     return {"hello": "world"}
 
 
 @app.post("/whatsapp")
 async def whatsapp_webhook(
     request: Request, Body: str = Form(...), NumMedia: str = Form(default="0")
-):
+) -> Response:
     (form, resp, _, msg) = await get_request_body(request, Body)
 
     if int(NumMedia) > 0:
